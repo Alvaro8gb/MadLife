@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[scripts]
+app = "streamlit run app.py"
+format = "black app"
+
+[packages]
+streamlit = "*"
+pandas = "*"
+chromadb = "*"
+plotly = "*"
+
+[dev-packages]
+ipykernel = "*"
+
+[requires]
+python_version = "3.10"
+python_full_version = "3.10.12"
