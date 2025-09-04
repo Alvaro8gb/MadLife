@@ -10,6 +10,11 @@ import pandas as pd
 import os
 import plotly.express as px
 import time
+
+import sys
+import pysqlite3 as sqlite3
+sys.modules['sqlite3'] = sqlite3
+
 from embedding_manager import EventEmbeddingManager, create_embedding_database
 from apiManager import load_madrid_events_data
 
