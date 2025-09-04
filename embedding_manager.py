@@ -6,8 +6,12 @@ for event descriptions using ChromaDB and efficient Spanish language models.
 """
 
 import re
-import pandas as pd
+import sys
+import pysqlite3 as sqlite3
+sys.modules['sqlite3'] = sqlite3
+
 import chromadb
+import pandas as pd
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
 from typing import  Dict, Any, Optional
@@ -152,7 +156,7 @@ class EventEmbeddingManager:
                     continue
                     
                 texts.append(text)
-                ids.append(str(row['ID-EVENTO']))
+                ids.append(str(row[' ID-EVENTO']))
                 
                 # Prepare metadata
                 metadata = {
@@ -321,8 +325,7 @@ def create_embedding_database(df: pd.DataFrame, db_path: str = "./chroma_db") ->
     Returns:
         EventEmbeddingManager instance
     """
-    # Load data
-    
+
     # Create manager
     manager = EventEmbeddingManager(db_path=db_path)
     

@@ -5,15 +5,11 @@ Interactive web application for searching events using semantic embeddings
 with advanced filtering capabilities.
 """
 
+import os
+import time
 import streamlit as st
 import pandas as pd
-import os
 import plotly.express as px
-import time
-
-import sys
-import pysqlite3 as sqlite3
-sys.modules['sqlite3'] = sqlite3
 
 from embedding_manager import EventEmbeddingManager, create_embedding_database
 from apiManager import load_madrid_events_data
@@ -56,13 +52,6 @@ def initialize_embedding_manager(df:pd.DataFrame):
     
     return manager
 
-@st.cache_data
-def load_raw_data():
-    """Load raw CSV data for metadata analysis."""
-    csv_path = "pruebas/data/300107-0-agenda-actividades-eventos.csv"
-    if os.path.exists(csv_path):
-        return pd.read_csv(csv_path, sep=';', low_memory=False)
-    return None
 
 def extract_metadata_options(df):
     """Extract unique values for metadata filtering."""
@@ -245,7 +234,6 @@ def main():
     
     if manager is None:
         st.stop()
-    
     
     # Database stats
     stats = manager.get_collection_stats()

@@ -29,3 +29,10 @@ def load_madrid_events_data():
     except Exception as e:
         st.error(f"Error processing data: {e}")
         return pd.DataFrame()
+
+
+if __name__ == "__main__":
+   df = load_madrid_events_data()
+
+   print(df.shape)
+   print(df.columns)
