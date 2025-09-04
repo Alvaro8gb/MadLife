@@ -9,12 +9,13 @@ import streamlit as st
 import pandas as pd
 import os
 import plotly.express as px
+import time
 from embedding_manager import EventEmbeddingManager, create_embedding_database
+from apiManager import load_madrid_events_data
 
 
-# Configure Streamlit page
 st.set_page_config(
-    page_title="MadLife Event Search",
+    page_title="MadLife",
     page_icon="🎭",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -30,14 +31,21 @@ def initialize_embedding_manager(df:pd.DataFrame):
     if os.path.exists(db_path) and os.listdir(db_path):
         # Load existing database
         manager = EventEmbeddingManager(db_path=db_path)
-        st.success("✅ Base de datos de embeddings cargada correctamente!")
+        # Show success message briefly
+        _placeholder = st.empty()
+        _placeholder.success("✅ Base de datos de embeddings cargada correctamente!")
+        time.sleep(2)
+        _placeholder.empty()
     elif len(df) > 0:
         # Create new database from CSV
-        st.info("🔄 Creando base de datos de embeddings por primera vez...")
-        with st.spinner("Procesando eventos y creando embeddings..."):
+        with st.spinner("Creando base de datos por primera vez..."):
             df = load_raw_data()
             manager = create_embedding_database(df, db_path)
-        st.success("✅ Base de datos de embeddings creada exitosamente!")
+        # Show creation success message briefly
+        _placeholder = st.empty()
+        _placeholder.success("✅ Base de datos creada exitosamente!")
+        time.sleep(3)
+        _placeholder.empty()
     else:
         st.error(f"❌ Fallo al crear la base de datos")
         return None
@@ -166,6 +174,10 @@ def display_search_results(results_df, query):
                 
                 if row['venue']:
                     details.append(f"🏢 {row['venue']}")
+                # URL link
+                if row.get('url'):
+                    # Render as clickable link opening in a new tab
+                    st.markdown(f"[🔗 Más info]({row['url']})")
                 
                 st.markdown(" • ".join(details))
             
@@ -216,11 +228,12 @@ def main():
     """Main application function."""
     
     # Header
-    st.title("🎭 MadLife Event Search")
+    st.title("🎭 MadLife Buscador de Eventos")
     st.markdown("Busca el evento que mejor se adapte a ti")
 
     # Load raw data for metadata
-    raw_df = load_raw_data()
+    raw_df = load_madrid_events_data() #load_raw_data()
+    print(raw_df.shape)
     metadata_options = extract_metadata_options(raw_df)
     
     # Initialize embedding manager
@@ -230,15 +243,36 @@ def main():
         st.stop()
     
     
-    # Sidebar for filters and info
-    st.sidebar.markdown("# 🎭 MadLife Search")
-    
     # Database stats
     stats = manager.get_collection_stats()
     st.sidebar.metric("Número de Eventos", stats['total_events'])
     
     # Create metadata filters
     filters = create_metadata_filters(metadata_options)
+    
+    # Date range filter (based on raw data FECHA column)
+    try:
+        date_series = pd.to_datetime(raw_df['FECHA'], errors='coerce')
+        min_date = date_series.min().date() if not date_series.isna().all() else pd.to_datetime('today').date()
+        max_date = date_series.max().date() if not date_series.isna().all() else pd.to_datetime('today').date()
+    except Exception:
+        min_date = pd.to_datetime('today').date()
+        max_date = pd.to_datetime('today').date()
+
+    st.sidebar.markdown("### 📅 Filtrar por fecha (fecha de inicio)")
+ 
+    date_range = st.sidebar.date_input(
+        "Intervalo de fechas:",
+        value=(min_date, max_date),
+        format="DD/MM/YYYY", # Formato de fecha
+    )
+
+    # Normalize date_range to two values
+    if len(date_range) == 2:
+        date_since, date_to = date_range[0], date_range[1]
+    else:
+        date_since = date_range
+        date_to = date_range
     
     # Search configuration
     st.sidebar.markdown("### ⚙️ Configuración de Búsqueda")
@@ -275,18 +309,14 @@ def main():
         # Search execution
         if query:
             with st.spinner("🔍 Buscando eventos similares..."):
-                # Prepare filter metadata for ChromaDB
-                filter_metadata = {}
-                if filters:
-                    filter_metadata = filters.copy()
-                
+               
                 # Search for similar events
                 results_df = manager.export_similar_events_df(
                     query=query,
                     n_results=n_results
                 )
                 
-                # Apply additional filtering if needed (ChromaDB filtering might not work perfectly)
+                
                 if filters and not results_df.empty:
                     for key, value in filters.items():
                         if key == 'district':
@@ -297,6 +327,12 @@ def main():
                             results_df = results_df[results_df['free'] == value]
                         elif key == 'venue':
                             results_df = results_df[results_df['venue'].str.contains(value, case=False, na=False)]
+
+                dts = pd.to_datetime(date_since)
+                dto = pd.to_datetime(date_to)
+                results_df['date'] = pd.to_datetime(results_df['date'], errors='coerce')
+                results_df = results_df[(results_df['date'] >= dts) & (results_df['date'] <= dto)]
+            
                 
                 # Reset index after filtering
                 results_df.reset_index(drop=True, inplace=True)
@@ -307,7 +343,7 @@ def main():
     
     with col2:
         if query and not results_df.empty:
-            # Summary metrics
+
             st.markdown("### 📈 Resumen de Resultados")
             
             avg_similarity = results_df['similarity_score'].mean()
@@ -353,9 +389,9 @@ def main():
         
         # Prepare export data
         export_df = results_df[['rank', 'title', 'similarity_score', 'date', 'time', 
-                               'district', 'venue', 'type', 'free']].copy()
+                               'district', 'venue', 'type', 'free', 'url']].copy()
         export_df.columns = ['Ranking', 'Título', 'Similitud', 'Fecha', 'Hora',
-                           'Distrito', 'Lugar', 'Tipo', 'Gratuito']
+                           'Distrito', 'Lugar', 'Tipo', 'Gratuito', 'URL']
         
         csv_data = export_df.to_csv(index=False, encoding='utf-8')
         
@@ -370,7 +406,7 @@ def main():
     st.markdown("---")
     st.markdown(
         "🤖 Búsqueda semántica con IA • "
-        "Modelo: paraphrase-multilingual-MiniLM-L12-v2 • ChromaDB"
+        "ChromaDB"
     )
 
 if __name__ == "__main__":

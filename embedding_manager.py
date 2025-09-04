@@ -5,15 +5,12 @@ This module provides functionality to create and query an embedding database
 for event descriptions using ChromaDB and efficient Spanish language models.
 """
 
-import os
+import re
 import pandas as pd
 import chromadb
 from chromadb.config import Settings
 from sentence_transformers import SentenceTransformer
-from typing import List, Dict, Any, Optional
-import numpy as np
-from datetime import datetime
-import re
+from typing import  Dict, Any, Optional
 
 
 class EventEmbeddingManager:
@@ -65,7 +62,8 @@ class EventEmbeddingManager:
             self.collection = self.client.create_collection(
                 name=self.collection_name,
                 embedding_function=None,
-                metadata={"description": "Event descriptions embeddings for MadLife"}
+                metadata={"description": "Event descriptions embeddings for MadLife",
+                          "hnsw:space": "cosine"}
             )
     
     def _clean_text(self, text: str) -> str:
@@ -166,15 +164,14 @@ class EventEmbeddingManager:
                     'district': str(row.get('DISTRITO-INSTALACION', '')),
                     'venue': str(row.get('NOMBRE-INSTALACION', '')),
                     'type': str(row.get('TIPO', '')),
-                    'audience': str(row.get('AUDIENCIA', ''))
+                    'audience': str(row.get('AUDIENCIA', '')),
+                    'url': str(row.get('URL-ACTIVIDAD', ''))
                 }
                 metadatas.append(metadata)
             
             if texts:
-                # Generate embeddings
                 embeddings = self.model.encode(texts, show_progress_bar=True)
                 
-                # Add to collection
                 self.collection.add(
                     embeddings=embeddings.tolist(),
                     documents=texts,
@@ -208,13 +205,10 @@ class EventEmbeddingManager:
         if not query or not query.strip():
             return {"results": [], "distances": [], "metadatas": []}
         
-        # Clean and prepare query
         clean_query = self._clean_text(query)
         
-        # Generate query embedding
         query_embedding = self.model.encode([clean_query])
         
-        # Prepare where clause for filtering
         where_clause = None
         if filter_metadata:
             where_clause = {}
@@ -222,7 +216,6 @@ class EventEmbeddingManager:
                 if value:
                     where_clause[key] = {"$eq": str(value)}
         
-        # Search in ChromaDB
         results = self.collection.query(
             query_embeddings=query_embedding.tolist(),
             n_results=n_results,
@@ -230,7 +223,6 @@ class EventEmbeddingManager:
             include=['documents', 'metadatas', 'distances']
         )
         
-        # Format results
         formatted_results = {
             'query': query,
             'results': results.get('documents', [[]])[0],
@@ -304,13 +296,14 @@ class EventEmbeddingManager:
                 'title': metadata.get('title', ''),
                 'similarity_score': 1 - distance,  # Convert distance to similarity
                 'distance': distance,
-                'description_preview': doc[:200] + "..." if len(doc) > 200 else doc,
+                'description_preview': doc[:500] + "..." if len(doc) > 500 else doc,
                 'date': metadata.get('date', ''),
                 'time': metadata.get('time', ''),
                 'district': metadata.get('district', ''),
                 'venue': metadata.get('venue', ''),
                 'type': metadata.get('type', ''),
-                'free': metadata.get('free', '')
+                'free': metadata.get('free', ''),
+                'url': metadata.get('url', '')
             }
             data.append(row)
         
