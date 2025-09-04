@@ -42,10 +42,9 @@ def initialize_embedding_manager(df:pd.DataFrame):
         time.sleep(2)
         _placeholder.empty()
     elif len(df) > 0:
-        # Create new database from CSV
         with st.spinner("Creando base de datos por primera vez..."):
-            df = load_raw_data()
             manager = create_embedding_database(df, db_path)
+        
         # Show creation success message briefly
         _placeholder = st.empty()
         _placeholder.success("✅ Base de datos creada exitosamente!")
