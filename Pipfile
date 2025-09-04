@@ -12,6 +12,8 @@ streamlit = "*"
 pandas = "*"
 chromadb = "*"
 plotly = "*"
+pysqlite3-binary = "*"
+sentence-transformers = "*"
 
 [dev-packages]
 ipykernel = "*"
