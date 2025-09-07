@@ -8,7 +8,6 @@ and quick actions for events.
 import streamlit as st
 import pandas as pd
 from .calendar_export import create_calendar_export_links, render_quick_calendar_button
-from .events import display_event_detail
 
 
 def navigate_to_event_detail(event_data):
@@ -91,7 +90,6 @@ def _render_result_main_content(row, idx):
         ):
             # Store the selected event in session state and navigate to detail page
             st.session_state.selected_event = row.to_dict()
-            # Navigate to detail page using the correct page reference
             try:
                 st.switch_page("pages/event_detail.py")
             except Exception as e:
@@ -160,24 +158,6 @@ def _render_result_actions(row):
         type_clean = row['type'].split('/')[-1] if '/' in row['type'] else row['type']
         st.markdown(f"🏷️ **{type_clean}**")
     
-    # View details button
-    st.markdown("---")
-    if st.button(
-        "👁️ Ver detalles", 
-        key=f"detail_btn_{row.name}", 
-        use_container_width=True,
-        type="secondary"
-    ):
-        st.toast("Accion")
-        st.session_state.selected_event = row.to_dict()
-        # Navigate to detail page using the correct page reference
-        try:
-            st.switch_page("pages/event_detail.py")
-        except Exception as e:
-            st.error(f"Error navegando: {e}")
-            # Fallback: use session state flag
-            st.session_state.navigate_to_detail = True
-            st.rerun()
     
     # Quick calendar export button
     st.markdown("---")

@@ -167,7 +167,8 @@ def create_timeline_chart(results_df, key_prefix=""):
             x='fecha',
             y='cantidad',
             title='Eventos por Fecha',
-            labels={'fecha': 'Fecha', 'cantidad': 'Número de Eventos'}
+            labels={'fecha': 'Fecha', 'cantidad': 'Número de Eventos'}, 
+            markers=True
         )
         
         fig.update_layout(height=400)
