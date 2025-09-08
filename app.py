@@ -7,6 +7,7 @@ with advanced filtering capabilities and detailed event visualization.
 
 import streamlit as st
 from config import APP_CONFIG
+from resourceManager import load_resources
 
 # Configure Streamlit page
 st.set_page_config(
@@ -20,6 +21,9 @@ st.set_page_config(
 def main():
     """Main application function with multipage navigation."""
     
+    logo = load_resources(APP_CONFIG["logo_path"])
+    st.sidebar.write(logo, unsafe_allow_html=True)
+
     # Define pages
     search_page = st.Page("pages/search.py", title="Buscar Eventos", icon="🔍", default=True)
     event_detail_page = st.Page("pages/event_detail.py", title="Detalles del Evento", icon="🎭")

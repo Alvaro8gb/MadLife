@@ -1,129 +1,106 @@
-# MadLife Event Search - Refactored Architecture
+# MadLife: Descubre los mejores eventos de Madrid
+   [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://madlife.streamlit.app/)
 
-## Project Structure
+<div>
+    <img src="assets/logo.svg" alt="MadLife Logo" style="height: 200px; vertical-align: middle;" />
+</div>
 
-The application has been refactored into a modular architecture for better scalability and maintainability:
+``MadLife`` surge como una herramienta inteligente que facilita la búsqueda de eventos en Madrid utilizando búsqueda semántica avanzada y tecnología de embeddings vectoriales para encontrar exactamente lo que buscas.
 
+## Características
+
+1. **Búsqueda semántica inteligente**: Utiliza embeddings vectoriales para encontrar eventos relevantes incluso con búsquedas en lenguaje natural.
+   
+2. **Visualización avanzada**: Dashboard interactivo con gráficos de similitud, distribución por distritos y análisis temporal.
+
+3. **Filtrado multicriteria**: Filtra eventos por distrito, tipo, precio, fecha y otros metadatos relevantes.
+
+4. **Exportación a calendario**: Integración directa con Google Calendar, Outlook, Yahoo Calendar y descarga de archivos ICS.
+
+
+
+## Instalación
+
+1. Clona el repositorio o descarga el código fuente.
+2. Instala las dependencias de Python necesarias:
+
+```bash
+pip install -r requirements.txt
 ```
-MadLife/
-├── app.py                      # Main Streamlit application
-├── config.py                   # Configuration constants and settings
-├── utils.py                    # Utility functions for data processing
-├── embedding_manager.py        # Vector database and embeddings management
-├── apiManager.py              # Data loading and API management
-├── visualizations/             # Visualization components package
-│   ├── __init__.py            # Package initialization with exports
-│   ├── calendar_export.py     # Calendar export functionality
-│   ├── charts.py              # Charts and analytics visualizations
-│   ├── event_detail.py        # Detailed event view component
-│   └── search_results.py      # Search results display component
-├── chroma_db/                 # Vector database storage
-├── pruebas/                   # Testing and data analysis notebooks
-└── README.md                  # Project documentation
-```
 
-## Key Features
+## Ejecutar la Aplicación
 
-### 🎯 Event Visualization
-- **Detailed Event View**: Click on any event to see comprehensive details
-- **Calendar Export**: Export events to Google Calendar, Outlook, Yahoo, or download as ICS
-- **Interactive Search Results**: Clickable event titles with quick actions
+Para ejecutar la aplicación de Streamlit, navega al directorio del proyecto y ejecuta el siguiente comando:
 
-### 📊 Analytics Dashboard
-- **Similarity Charts**: Visual representation of search relevance
-- **Distribution Charts**: Events by district, type, and price
-- **Summary Metrics**: Key statistics about search results
-- **Timeline View**: Events distributed over time
-
-### 🔍 Advanced Filtering
-- **Metadata Filters**: Filter by district, type, venue, and price
-- **Date Range**: Filter events by date range
-- **Search Configuration**: Customize number of results and visualizations
-
-### 📅 Calendar Integration
-- **Multiple Formats**: Support for Google Calendar, Outlook, Yahoo Calendar
-- **ICS Export**: Download standard calendar files
-- **Quick Export**: One-click calendar addition from search results
-
-## Module Documentation
-
-### `visualizations/` Package
-
-#### `calendar_export.py`
-- `create_calendar_export_links()`: Generate calendar URLs for all platforms
-- `generate_ics_content()`: Create ICS file content
-- `render_calendar_export_buttons()`: HTML buttons for calendar export
-
-#### `charts.py`
-- `create_similarity_chart()`: Similarity score visualization
-- `create_district_distribution_chart()`: District distribution pie chart
-- `create_event_type_chart()`: Event type bar chart
-- `render_analytics_dashboard()`: Complete analytics dashboard
-
-#### `event_detail.py`
-- `display_event_detail()`: Comprehensive event detail view
-- `display_event_preview()`: Compact event preview for lists
-
-#### `search_results.py`
-- `display_search_results()`: Interactive search results display
-- `display_search_summary()`: Results summary sidebar
-- `display_no_results_message()`: Helpful no-results screen
-
-### `config.py`
-- Application configuration constants
-- UI messages and text
-- Color schemes and styling
-- Date formats and field mappings
-
-### `utils.py`
-- Data processing utilities
-- Filter creation and application
-- Session state management
-- Export data preparation
-
-## Usage
-
-### Running the Application
 ```bash
 streamlit run app.py
 ```
 
-### Adding New Visualizations
-1. Create a new file in `visualizations/` directory
-2. Add your visualization functions
-3. Import in `visualizations/__init__.py`
-4. Use in `app.py` main function
+Esto iniciará el servidor de Streamlit y abrirá la aplicación en tu navegador predeterminado.
 
-### Extending Functionality
-- **New Calendar Platforms**: Add to `calendar_export.py`
-- **Additional Charts**: Extend `charts.py`
-- **Custom Filters**: Add to `utils.py`
-- **New Event Fields**: Update `config.py` field mappings
+## Estructura de la Aplicación
 
-## Dependencies
+### Módulos de funcionalidad (Frontend):
+   Estos archivos y carpetas están relacionados con la interfaz de usuario y la presentación de datos:
+   - **pages**: Contiene las páginas principales de la aplicación (búsqueda y detalles de eventos).
+   - **core**: Módulos de visualización como gráficos, exportación de calendarios y resultados de búsqueda.
 
-```python
-streamlit           # Web application framework
-pandas             # Data manipulation
-plotly             # Interactive charts
-chromadb           # Vector database
-sentence-transformers  # Text embeddings
-```
+### Módulos de funcionalidad (Backend):
+   Estos archivos manejan la lógica de negocio, acceso a datos y las operaciones de backend:
+   - **app.py**: Archivo principal que ejecuta la aplicación Streamlit.
+   - **config.py**: Configuraciones globales de la aplicación.
+   - **utils.py**: Funciones utilitarias para procesamiento de datos.
+   - **embedding_db.py**: Gestión de la base de datos vectorial y embeddings semánticos.
+   - **apiManager.py**: Gestiona la carga de datos y APIs externas.
+   - **chroma_db**: Base de datos vectorial para almacenamiento de embeddings.
 
-## Future Enhancements
+### Metaarchivos de instalación y configuración:
+   Estos archivos son usados para la instalación, configuración y documentación del proyecto:
+   - **README.md**: Proporciona información sobre el proyecto, cómo instalarlo y cómo usarlo.
+   - **Pipfile / Pipfile.lock**: Gestión de dependencias de Python con Pipenv.
 
-- [ ] User favorites and saved searches
-- [ ] Event recommendations based on preferences
-- [ ] Social sharing integration
-- [ ] Advanced analytics with machine learning insights
-- [ ] Mobile-responsive design improvements
-- [ ] Multi-language support
 
-## Contributing
+## Datos
 
-When adding new features:
-1. Follow the modular structure
-2. Add appropriate documentation
-3. Update configuration in `config.py`
-4. Create utility functions in `utils.py`
-5. Test thoroughly with different event types
+En el desarrollo de este proyecto se han utilizado los siguientes conjuntos de datos:
+
+- **Portal de Datos Abiertos de Madrid**:
+  - [**API de Eventos**](https://datos.madrid.es/): Sistema de información de eventos culturales y actividades de la ciudad de Madrid.
+
+
+- **Tecnologías de Embeddings**:
+  - **ChromaDB**: Base de datos vectorial para almacenamiento y búsqueda de embeddings.
+  - **Sentence Transformers**: Modelos de lenguaje para generar embeddings semánticos de alta calidad.
+
+
+
+
+## Mejoras Futuras
+
+* [ ] RAG con LLM
+* [ ] Favoritos de usuario y búsquedas guardadas
+* [ ] Integración para compartir en redes sociales
+* [ ] Análisis avanzado con insights de machine learning
+* [ ] Mejoras en el diseño responsivo para dispositivos móviles
+* [ ] Soporte multilingüe
+
+## Contribuyendo
+
+Al agregar nuevas funciones:
+
+1. Seguir la estructura modular
+2. Añadir la documentación correspondiente
+3. Actualizar la configuración en `config.py`
+4. Crear funciones auxiliares en `utils.py`
+5. Probar exhaustivamente con diferentes tipos de eventos
+
+## Licencia
+
+Este proyecto está bajo la licencia [MIT](LICENSE).
+
+## Créditos
+
+- **Fuente de Datos**: [Datos Abiertos de Madrid](https://datos.madrid.es/)
+- **Librerías Usadas**: [Streamlit](https://streamlit.io/), [Pandas](https://pandas.pydata.org/), [Plotly](https://plotly.com/), [ChromaDB](https://www.trychroma.com/), [Sentence Transformers](https://www.sbert.net/)
+
+

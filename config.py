@@ -10,7 +10,8 @@ APP_CONFIG = {
     'page_title': 'MadLife',
     'page_icon': '🎭',
     'layout': 'wide',
-    'initial_sidebar_state': 'expanded'
+    'initial_sidebar_state': 'expanded',
+    'logo_path': 'assets/logo.svg'
 }
 
 # Search configuration
